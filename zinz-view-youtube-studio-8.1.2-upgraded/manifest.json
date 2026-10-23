@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "ZINZ / VELVET \u2014 Zen + Music",
-  "version": "8.1.2",
-  "description": "YouTube and YouTube Music customization with color studio, shareable profiles, layout controls, and hardened video scene analysis",
+  "name": "ZINZ / VELVET — Zen + Music",
+  "version": "8.1.5",
+  "description": "YouTube and YouTube Music customization with color studio, shareable profiles, layout controls, and optimized video rendering",
   "options_ui": {
     "page": "color-studio.html",
     "open_in_tab": true
