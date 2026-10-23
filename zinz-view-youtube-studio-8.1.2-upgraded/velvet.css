@@ -1,0 +1,82 @@
+
+/* ZINZ / VELVET — dedicated Zen / Firefox YouTube presentation */
+html.zv{color-scheme:dark;--zv-bg:#090710;--zv-layer:#151021;--zv-surface:#21192f;--zv-hover:#30233f;--zv-line:rgba(202,174,248,.12);--zv-ink:#f5efff;--zv-muted:#aaa0bc;--zv-accent:#a77af4;--zv-rgb:167,122,244;--zv-radius:17px;--yt-spec-base-background:var(--zv-bg)!important;--yt-spec-raised-background:var(--zv-layer)!important;--yt-spec-menu-background:var(--zv-surface)!important;--yt-spec-text-primary:var(--zv-ink)!important;--yt-spec-text-secondary:var(--zv-muted)!important;--yt-spec-general-background-a:var(--zv-bg)!important;--yt-spec-general-background-b:var(--zv-layer)!important;--yt-spec-general-background-c:var(--zv-surface)!important;--yt-spec-brand-background-solid:var(--zv-bg)!important;--yt-spec-brand-button-background:var(--zv-accent)!important;--yt-spec-static-brand-red:var(--zv-accent)!important;--yt-spec-call-to-action:var(--zv-accent)!important}
+html.zv body,html.zv ytd-app,html.zv #content.ytd-app,html.zv ytd-browse,html.zv ytd-watch-flexy,html.zv ytd-search,html.zv ytd-shorts,html.zv ytd-playlist-renderer{background:var(--zv-bg)!important;color:var(--zv-ink)!important}
+html.zv body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 42% at 62% -9%,rgba(var(--zv-rgb),.105),transparent 75%),radial-gradient(ellipse 32% 38% at -10% 70%,#6e3b8510,transparent 80%)}
+html.zv *{scrollbar-color:#57436d transparent}
+html.zv ::selection{background:rgba(var(--zv-rgb),.4);color:white}
+html.zv #masthead-container{background:rgba(16,11,26,.76)!important;backdrop-filter:blur(26px) saturate(135%);-webkit-backdrop-filter:blur(26px) saturate(135%);border-bottom:1px solid var(--zv-line)!important;box-shadow:0 12px 40px #0002}
+html.zv #masthead{background:transparent!important}
+html.zv #logo-icon{filter:grayscale(1) brightness(2.3)}
+html.zv #center.ytd-masthead #container.ytd-searchbox,html.zv ytd-searchbox #container{background:#1b1527!important;border:1px solid #b995e32b!important;border-radius:var(--zv-radius) 0 0 var(--zv-radius)!important;box-shadow:inset 0 2px 7px #0005!important}
+html.zv ytd-searchbox input{color:var(--zv-ink)!important}
+html.zv #search-icon-legacy{background:#292038!important;border:1px solid #b995e32b!important;border-radius:0 var(--zv-radius) var(--zv-radius) 0!important}
+html.zv #voice-search-button button,html.zv #buttons ytd-button-renderer button,html.zv ytd-masthead yt-icon-button{border-radius:13px!important}
+html.zv ytd-guide-renderer,html.zv #guide-content,html.zv ytd-mini-guide-renderer{background:rgba(15,11,23,.93)!important;backdrop-filter:blur(22px);border-right:1px solid var(--zv-line)}
+html.zv ytd-guide-entry-renderer,html.zv ytd-mini-guide-entry-renderer{border-radius:11px!important;margin:3px 9px!important}
+html.zv ytd-guide-entry-renderer:hover,html.zv ytd-mini-guide-entry-renderer:hover{background:var(--zv-hover)!important}
+html.zv ytd-guide-entry-renderer[active],html.zv ytd-mini-guide-entry-renderer[active]{background:rgba(var(--zv-rgb),.17)!important}
+html.zv ytd-guide-entry-renderer[active] yt-icon,html.zv ytd-mini-guide-entry-renderer[active] yt-icon{color:var(--zv-accent)!important}
+html.zv ytd-guide-renderer #guide-section-title{font-size:10px!important;letter-spacing:1.8px!important;text-transform:uppercase;color:var(--zv-muted)!important}
+html.zv yt-chip-cloud-renderer{background:transparent!important}
+html.zv yt-chip-cloud-chip-renderer{background:#21192f!important;border:1px solid var(--zv-line)!important;border-radius:11px!important;color:var(--zv-ink)!important;transition:background .2s,border-color .2s}
+html.zv yt-chip-cloud-chip-renderer[selected]{background:var(--zv-accent)!important;color:#11091d!important}
+html.zv yt-chip-cloud-chip-renderer:hover{border-color:rgba(var(--zv-rgb),.55)!important}
+html.zv ytd-rich-grid-media,html.zv ytd-grid-video-renderer,html.zv ytd-video-renderer,html.zv ytd-compact-video-renderer{border-radius:var(--zv-radius)!important;transition:background .22s,transform .22s!important}
+html.zv ytd-rich-grid-media:hover,html.zv ytd-video-renderer:hover{background:rgba(var(--zv-rgb),.045)!important}
+html.zv ytd-thumbnail #thumbnail,html.zv ytd-playlist-thumbnail #thumbnail{border-radius:var(--zv-radius)!important;overflow:hidden;box-shadow:0 12px 28px #0003;border:1px solid #ffffff0b}
+html.zv ytd-thumbnail img,html.zv ytd-playlist-thumbnail img{transition:transform .3s ease}
+html.zv ytd-rich-grid-media:hover ytd-thumbnail img{transform:scale(1.025)}
+html.zv ytd-rich-grid-media #video-title,html.zv ytd-video-renderer #video-title,html.zv ytd-compact-video-renderer #video-title{font-weight:650!important;letter-spacing:-.23px!important}
+html.zv #metadata-line,html.zv #byline-container{color:var(--zv-muted)!important}
+html.zv ytd-watch-flexy #primary-inner,html.zv ytd-watch-flexy #secondary-inner{padding-top:17px}
+html.zv ytd-watch-metadata #title h1,html.zv ytd-watch-metadata h1{font-weight:740!important;letter-spacing:-.65px!important}
+html.zv ytd-watch-metadata #description,html.zv ytd-text-inline-expander,html.zv ytd-comments #header{background:linear-gradient(145deg,rgba(40,29,57,.83),rgba(23,17,33,.83))!important;border:1px solid var(--zv-line)!important;border-radius:var(--zv-radius)!important;padding:14px!important;box-shadow:inset 0 1px 0 #ffffff09}
+html.zv ytd-watch-metadata #description ytd-text-inline-expander{border:0!important;background:transparent!important;padding:0!important;box-shadow:none}
+html.zv ytd-watch-metadata ytd-subscribe-button-renderer button{background:var(--zv-accent)!important;color:#120a1c!important;border-radius:11px!important;font-weight:750!important}
+html.zv ytd-watch-metadata #actions button,html.zv ytd-watch-metadata yt-button-shape button{border-radius:11px!important}
+html.zv ytd-watch-metadata #actions button:hover{background:var(--zv-hover)!important}
+html.zv ytd-compact-video-renderer{padding:7px!important;margin:3px 0!important}
+html.zv ytd-compact-video-renderer:hover{background:rgba(var(--zv-rgb),.06)!important}
+html.zv ytd-menu-popup-renderer,html.zv tp-yt-paper-dialog,html.zv ytd-popup-container tp-yt-paper-dialog,html.zv yt-dropdown-menu,html.zv ytd-multi-page-menu-renderer{background:rgba(31,23,44,.96)!important;backdrop-filter:blur(25px);border:1px solid #c6a7f026!important;border-radius:16px!important;box-shadow:0 20px 60px #0009!important;overflow:hidden}
+html.zv ytd-menu-service-item-renderer:hover,html.zv tp-yt-paper-item:hover{background:var(--zv-hover)!important}
+html.zv .ytp-play-progress{background:var(--zv-accent)!important}
+html.zv .ytp-scrubber-button,html.zv .ytp-volume-slider-handle{background:var(--zv-accent)!important}
+html.zv .ytp-chrome-bottom{filter:drop-shadow(0 2px 5px #0008)}
+html.zv #cinematics canvas{opacity:.48}
+html.zv ytd-comments #content-text{line-height:1.65}
+html.zv a:hover{color:var(--zv-accent)}
+/* Shorts stay in their own destination; the shelf is suppressed outside it. */
+html.zv.zv-separate-shorts:not(.zv-on-shorts) ytd-rich-shelf-renderer[is-shorts],html.zv.zv-separate-shorts:not(.zv-on-shorts) ytd-reel-shelf-renderer,html.zv.zv-separate-shorts:not(.zv-on-shorts) ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),html.zv.zv-separate-shorts:not(.zv-on-shorts) ytd-rich-section-renderer:has(ytd-reel-shelf-renderer){display:none!important}
+html.zv.zv-separate-shorts:not(.zv-on-shorts) ytd-video-renderer:has(a[href^="/shorts/"]),html.zv.zv-separate-shorts:not(.zv-on-shorts) ytd-rich-item-renderer:has(a[href^="/shorts/"]){display:none!important}
+/* a separate, deliberate masthead shortcut */
+html.zv #zv-shorts{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;background:rgba(var(--zv-rgb),.12);border:1px solid rgba(var(--zv-rgb),.25);color:var(--zv-ink);border-radius:12px;height:34px;padding:0 13px;margin-inline:9px;font:650 12px system-ui;letter-spacing:.15px;cursor:pointer;transition:background .2s}
+html.zv #zv-shorts:hover,html.zv.zv-on-shorts #zv-shorts{background:rgba(var(--zv-rgb),.3)}
+html.zv #zv-shorts .zv-mark{color:var(--zv-accent);font-size:17px;line-height:1}
+html.zv #zv-brand{position:fixed;bottom:17px;left:18px;z-index:1800;pointer-events:none;font:750 9px system-ui;letter-spacing:2.5px;color:rgba(var(--zv-rgb),.44);text-shadow:0 2px 10px #0009}
+html.zv.zv-clean #zv-brand{display:none}
+html.zv.zv-clean ytd-rich-grid-renderer{--ytd-rich-grid-items-per-row:4}
+html.zv.zv-sharp ytd-thumbnail #thumbnail,html.zv.zv-sharp ytd-playlist-thumbnail #thumbnail{border-radius:7px!important}
+html.zv.zv-lowfx #masthead-container,html.zv.zv-lowfx ytd-guide-renderer,html.zv.zv-lowfx ytd-menu-popup-renderer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html.zv.zv-lowfx ytd-thumbnail img{transition:none!important}
+@media(max-width:850px){html.zv #zv-shorts{padding:0 9px;margin-inline:3px;font-size:0}html.zv #zv-shorts .zv-mark{font-size:19px}html.zv #zv-brand{display:none}}
+@media(prefers-reduced-motion:reduce){html.zv *{transition:none!important;animation-duration:.01ms!important}}
+
+/* VELVET 2.1 ADDITIVE REFINEMENTS — original skin above is unchanged. */
+html.zv.zv-hide-playables ytd-rich-section-renderer:has(a[href^="/playables/"]),
+html.zv.zv-hide-playables ytd-rich-section-renderer:has(a[href*="youtube.com/playables/"]),
+html.zv.zv-hide-playables ytd-rich-shelf-renderer:has(a[href^="/playables/"]),
+html.zv.zv-hide-playables ytd-rich-item-renderer:has(a[href^="/playables/"]),
+html.zv.zv-hide-playables ytd-game-card-renderer,
+html.zv.zv-hide-playables ytd-rich-grid-renderer ytd-rich-section-renderer:has([href*="/playables/"]){display:none!important}
+/* A consistent focus treatment for mouse-free navigation. */
+html.zv :is(a,button,input,[role="button"]):focus-visible{outline:2px solid var(--zv-accent)!important;outline-offset:3px!important}
+/* Quiet cards: details remain visible, while the information density stays predictable. */
+html.zv.zv-quiet #metadata-line{opacity:.8}
+html.zv.zv-quiet ytd-rich-grid-media #details{padding-top:3px}
+html.zv.zv-quiet ytd-rich-grid-media:hover #metadata-line{opacity:1}
+/* Watch page stays readable; no filters applied to the video, thumbnails, or images. */
+html.zv.zv-watch-focus ytd-watch-flexy:not([theater]) #secondary{opacity:.66;transition:opacity .22s ease}
+html.zv.zv-watch-focus ytd-watch-flexy:not([theater]) #secondary:hover,
+html.zv.zv-watch-focus ytd-watch-flexy:not([theater]) #secondary:focus-within{opacity:1}
+@media(prefers-reduced-motion:reduce){html.zv.zv-watch-focus ytd-watch-flexy #secondary{transition:none!important}}

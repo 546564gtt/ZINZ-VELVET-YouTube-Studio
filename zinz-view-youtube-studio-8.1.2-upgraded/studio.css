@@ -1,0 +1,41 @@
+/* ZINZ Studio — independently configurable YouTube layout and typography. */
+html.zv-studio{color-scheme:dark;--yt-spec-base-background:var(--zv-studio-bg)!important;--yt-spec-raised-background:var(--zv-studio-surface)!important;--yt-spec-menu-background:var(--zv-studio-panel)!important;--yt-spec-text-primary:var(--zv-studio-text)!important;--yt-spec-text-secondary:var(--zv-studio-muted)!important;--yt-spec-call-to-action:var(--zv-studio-accent)!important;--yt-spec-brand-button-background:var(--zv-studio-accent)!important;--yt-spec-brand-icon-active:var(--zv-studio-accent)!important;--ytd-rich-grid-items-per-row:var(--zv-studio-columns)!important;--ytd-rich-grid-posts-per-row:var(--zv-studio-columns)!important;font-family:var(--zv-studio-font)!important;font-size:calc(100% * var(--zv-studio-text-scale))!important;scroll-behavior:auto}
+html.zv-studio body,html.zv-studio ytd-app,html.zv-studio #content.ytd-app,html.zv-studio ytd-browse,html.zv-studio ytd-search,html.zv-studio ytd-watch-flexy{background:var(--zv-studio-bg)!important;color:var(--zv-studio-text)!important;font-family:var(--zv-studio-font)!important}
+html.zv-studio ytd-masthead,html.zv-studio #masthead-container{background:var(--zv-studio-surface)!important}
+html.zv-studio ytd-rich-grid-renderer,html.zv-studio ytd-rich-section-renderer,html.zv-studio ytd-watch-flexy #primary-inner,html.zv-studio ytd-watch-flexy #secondary-inner{--ytd-rich-grid-items-per-row:var(--zv-studio-columns)!important}
+html.zv-studio ytd-rich-grid-renderer #contents{column-gap:var(--zv-studio-gap)!important;row-gap:var(--zv-studio-gap)!important}
+html.zv-studio ytd-rich-item-renderer,html.zv-studio ytd-rich-grid-media,html.zv-studio ytd-video-renderer,html.zv-studio ytd-compact-video-renderer,html.zv-studio ytd-playlist-renderer{border-radius:var(--zv-studio-radius)!important}
+html.zv-studio ytd-rich-item-renderer{margin-bottom:var(--zv-studio-gap)!important}
+html.zv-studio ytd-thumbnail #thumbnail,html.zv-studio ytd-playlist-thumbnail #thumbnail{border-radius:var(--zv-studio-radius)!important;overflow:hidden!important}
+html.zv-studio.zv-studio-ratio-4-3 ytd-thumbnail #thumbnail,html.zv-studio.zv-studio-ratio-4-3 ytd-playlist-thumbnail #thumbnail{aspect-ratio:4/3!important;}
+html.zv-studio.zv-studio-ratio-1-1 ytd-thumbnail #thumbnail,html.zv-studio.zv-studio-ratio-1-1 ytd-playlist-thumbnail #thumbnail{aspect-ratio:1/1!important;}
+html.zv-studio #video-title,html.zv-studio ytd-watch-metadata h1,html.zv-studio ytd-watch-metadata #title,html.zv-studio ytd-rich-grid-media #video-title,html.zv-studio ytd-video-renderer #video-title{color:var(--zv-studio-title)!important;font-family:var(--zv-studio-font)!important;font-size:calc(1em * var(--zv-studio-title-scale))!important}
+html.zv-studio,html.zv-studio #content,html.zv-studio ytd-app,html.zv-studio ytd-app :is(yt-formatted-string,tp-yt-paper-item,button,input,textarea){font-family:var(--zv-studio-font)}
+html.zv-studio :is(yt-formatted-string, #content-text, #text, #author-text, .ytd-comment-renderer){color:var(--zv-studio-text)}
+html.zv-studio #metadata-line,html.zv-studio #byline-container,html.zv-studio ytd-video-meta-block #metadata,html.zv-studio #subtitle,html.zv-studio .ytd-video-meta-block{color:var(--zv-studio-muted)!important}
+html.zv-studio a,html.zv-studio a yt-formatted-string{color:var(--zv-studio-link)}
+html.zv-studio a:hover{color:var(--zv-studio-accent)!important}
+html.zv-studio ytd-comments #content-text,html.zv-studio ytd-comments #author-text,html.zv-studio ytd-comments #published-time-text,html.zv-studio ytd-comments yt-formatted-string{color:var(--zv-studio-comments)!important}
+html.zv-studio ytd-comments #header,html.zv-studio ytd-watch-metadata #description,html.zv-studio ytd-watch-metadata ytd-text-inline-expander,html.zv-studio ytd-menu-popup-renderer,html.zv-studio tp-yt-paper-dialog,html.zv-studio ytd-popup-container tp-yt-paper-dialog{background-color:var(--zv-studio-panel)!important}
+html.zv-studio .ytp-play-progress,html.zv-studio .ytp-scrubber-button,html.zv-studio .ytp-volume-slider-handle{background:var(--zv-studio-progress)!important}
+html.zv-studio ytd-watch-metadata yt-button-shape button,html.zv-studio ytd-watch-metadata ytd-subscribe-button-renderer button{background:var(--zv-studio-accent)!important}
+html.zv-studio.zv-studio-hide-comments ytd-comments,html.zv-studio.zv-studio-hide-comments #comments,html.zv-studio.zv-studio-hide-comments ytd-item-section-renderer#sections ytd-comments{display:none!important}
+html.zv-studio.zv-studio-hide-related ytd-watch-next-secondary-results-renderer,html.zv-studio.zv-studio-hide-related ytd-watch-flexy #related,html.zv-studio.zv-studio-hide-related #related{display:none!important}
+html.zv-studio.zv-studio-hide-sidebar ytd-watch-flexy #secondary,html.zv-studio.zv-studio-hide-sidebar ytd-watch-flexy #secondary-inner{display:none!important}
+html.zv-studio.zv-studio-hide-live-chat ytd-live-chat-frame,html.zv-studio.zv-studio-hide-live-chat ytd-live-chat-renderer,html.zv-studio.zv-studio-hide-live-chat #chat-container{display:none!important}
+html.zv-studio.zv-studio-hide-shorts ytd-rich-shelf-renderer[is-shorts],html.zv-studio.zv-studio-hide-shorts ytd-reel-shelf-renderer,html.zv-studio.zv-studio-hide-shorts ytd-rich-section-renderer:has(a[href^="/shorts/"]),html.zv-studio.zv-studio-hide-shorts ytd-rich-item-renderer:has(a[href^="/shorts/"]),html.zv-studio.zv-studio-hide-shorts ytd-video-renderer:has(a[href^="/shorts/"]){display:none!important}
+html.zv-studio.zv-studio-hide-metadata #metadata-line,html.zv-studio.zv-studio-hide-metadata #byline-container,html.zv-studio.zv-studio-hide-metadata ytd-video-meta-block{display:none!important}
+html.zv-studio.zv-studio-hide-header #masthead-container,html.zv-studio.zv-studio-hide-header ytd-masthead{display:none!important}
+html.zv-studio.zv-studio-hide-endscreen .ytp-endscreen-content,html.zv-studio.zv-studio-hide-endscreen .ytp-ce-element{display:none!important}
+html.zv-studio.zv-studio-density-compact ytd-rich-item-renderer{margin-bottom:5px!important;--zv-studio-gap:8px}
+html.zv-studio.zv-studio-density-compact ytd-rich-grid-media #details{padding-top:3px!important}
+html.zv-studio.zv-studio-density-spacious ytd-rich-item-renderer{margin-bottom:24px!important;--zv-studio-gap:24px}
+html.zv-studio.zv-studio-scroll-smooth,html.zv-studio.zv-studio-scroll-smooth body,html.zv-studio.zv-studio-scroll-smooth ytd-app{scroll-behavior:smooth!important}
+html.zv-studio.zv-studio-scroll-snap ytd-rich-grid-renderer #contents,html.zv-studio.zv-studio-scroll-snap ytd-browse #contents{scroll-snap-type:y proximity}
+html.zv-studio.zv-studio-scroll-snap ytd-rich-item-renderer{scroll-snap-align:start}
+html.zv-studio :is(button,a,input,[role="button"]):focus-visible{outline-color:var(--zv-studio-accent)!important}
+html.zv-studio.zv-studio-scroll-snap{scroll-snap-type:y proximity!important}
+html.zv-studio.zv-studio-scroll-snap ytd-rich-item-renderer{scroll-snap-align:start}
+
+html.zv-studio.zv-studio-hide-description ytd-watch-metadata #description,html.zv-studio.zv-studio-hide-description ytd-watch-metadata ytd-text-inline-expander{display:none!important}
+html.zv-studio.zv-studio-hide-ads ytd-display-ad-renderer,html.zv-studio.zv-studio-hide-ads ytd-ad-slot-renderer,html.zv-studio.zv-studio-hide-ads ytd-in-feed-ad-layout-renderer,html.zv-studio.zv-studio-hide-ads ytd-promoted-sparkles-web-renderer,html.zv-studio.zv-studio-hide-ads ytd-promoted-video-renderer,html.zv-studio.zv-studio-hide-ads #player-ads,html.zv-studio.zv-studio-hide-ads #masthead-ad{display:none!important}

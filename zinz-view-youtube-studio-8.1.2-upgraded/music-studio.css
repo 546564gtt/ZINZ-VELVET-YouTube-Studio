@@ -1,0 +1,30 @@
+/* ZINZ Music Studio — custom palette, typography, library density and player sizing. */
+html.zv-music-studio{color-scheme:dark;--ytmusic-color-black1:var(--zm-studio-bg)!important;--ytmusic-color-black2:var(--zm-studio-surface)!important;--ytmusic-color-black3:var(--zm-studio-panel)!important;--ytmusic-color-white1:var(--zm-studio-text)!important;--ytmusic-color-white2:var(--zm-studio-title)!important;--ytmusic-color-white3:var(--zm-studio-muted)!important;--ytmusic-color-grey1:var(--zm-studio-muted)!important;--ytmusic-color-red:var(--zm-studio-accent)!important;font-family:var(--zm-studio-font)!important;font-size:calc(100% * var(--zm-studio-text-scale))!important}
+html.zv-music-studio body,html.zv-music-studio ytmusic-app,html.zv-music-studio #content.ytmusic-app,html.zv-music-studio ytmusic-browse-response,html.zv-music-studio ytmusic-player-page{background:var(--zm-studio-bg)!important;color:var(--zm-studio-text)!important;font-family:var(--zm-studio-font)!important}
+html.zv-music-studio ytmusic-nav-bar,html.zv-music-studio ytmusic-guide-renderer,html.zv-music-studio #guide{background:var(--zm-studio-surface)!important}
+html.zv-music-studio ytmusic-player-bar{height:var(--zm-studio-player-height)!important;min-height:var(--zm-studio-player-height)!important;background:var(--zm-studio-panel)!important}
+html.zv-music-studio ytmusic-responsive-list-item-renderer{min-height:var(--zm-studio-row-height)!important;height:auto!important}
+html.zv-music-studio ytmusic-two-row-item-renderer{--ytmusic-two-row-item-renderer-item-height:var(--zm-studio-art-height)!important}
+html.zv-music-studio ytmusic-two-row-item-renderer img,html.zv-music-studio ytmusic-responsive-list-item-renderer img,html.zv-music-studio ytmusic-thumbnail-renderer img{border-radius:var(--zm-studio-art-radius)!important}
+html.zv-music-studio ytmusic-responsive-list-item-renderer,html.zv-music-studio ytmusic-two-row-item-renderer,html.zv-music-studio ytmusic-carousel-shelf-renderer,html.zv-music-studio ytmusic-shelf-renderer{color:var(--zm-studio-text)!important}
+html.zv-music-studio ytmusic-two-row-item-renderer #title,html.zv-music-studio ytmusic-responsive-list-item-renderer #title,html.zv-music-studio .title,html.zv-music-studio ytmusic-player-bar .title,html.zv-music-studio ytmusic-player-page #title{color:var(--zm-studio-title)!important;font-family:var(--zm-studio-font)!important}
+html.zv-music-studio :is(.subtitle, #byline, .secondary-flex-columns, .ytmusic-player-bar .byline, .ytmusic-player-bar .content-info-wrapper .byline){color:var(--zm-studio-muted)!important}
+html.zv-music-studio a,html.zv-music-studio a yt-formatted-string{color:var(--zm-studio-link)}
+html.zv-music-studio ytmusic-chip-cloud-chip-renderer[selected],html.zv-music-studio ytmusic-menu-popup-renderer,html.zv-music-studio tp-yt-paper-dialog{background-color:var(--zm-studio-panel)!important}
+html.zv-music-studio .progress-bar-played,html.zv-music-studio #progress-bar .progress-bar-played,html.zv-music-studio .slider-knob{background:var(--zm-studio-progress)!important}
+html.zv-music-studio #lyrics-panel,html.zv-music-studio ytmusic-player-page #lyrics,html.zv-music-studio ytmusic-player-page [id*="lyrics"]{color:var(--zm-studio-lyrics)!important}
+html.zv-music-studio.zv-music-studio-hide-side-panel ytmusic-player-page #side-panel,html.zv-music-studio.zv-music-studio-hide-side-panel ytmusic-player-page #tabs-content{display:none!important}
+html.zv-music-studio.zv-music-studio-hide-recommendations ytmusic-browse-response ytmusic-shelf-renderer[data-zv-music-recommendation="true"],html.zv-music-studio.zv-music-studio-hide-recommendations ytmusic-browse-response ytmusic-carousel-shelf-renderer[data-zv-music-recommendation="true"]{display:none!important}
+html.zv-music-studio.zv-music-studio-hide-lyrics ytmusic-player-page #lyrics-panel,html.zv-music-studio.zv-music-studio-hide-lyrics ytmusic-player-page [id*="lyrics"]{display:none!important}
+html.zv-music-studio.zv-music-studio-hide-search ytmusic-nav-bar ytmusic-search-box,html.zv-music-studio.zv-music-studio-hide-search ytmusic-nav-bar #search-box{display:none!important}
+html.zv-music-studio.zv-music-studio-hide-player-bar ytmusic-player-bar{display:none!important}
+html.zv-music-studio.zv-music-studio-compact ytmusic-responsive-list-item-renderer{min-height:44px!important}
+html.zv-music-studio.zv-music-studio-compact ytmusic-two-row-item-renderer{--ytmusic-two-row-item-renderer-item-height:var(--zm-studio-compact-art-height)!important}
+html.zv-music-studio.zv-music-studio-density-compact ytmusic-two-row-item-renderer{--ytmusic-two-row-item-renderer-item-height:var(--zm-studio-layout-compact-art-height)!important}
+html.zv-music-studio.zv-music-studio-density-spacious ytmusic-two-row-item-renderer{--ytmusic-two-row-item-renderer-item-height:var(--zm-studio-layout-spacious-art-height)!important}
+html.zv-music-studio.zv-music-studio-sharp ytmusic-thumbnail-renderer img,html.zv-music-studio.zv-music-studio-sharp ytmusic-two-row-item-renderer img{border-radius:4px!important}
+html.zv-music-studio ytmusic-browse-response,html.zv-music-studio ytmusic-shelf-renderer,html.zv-music-studio ytmusic-carousel-shelf-renderer{--ytmusic-grid-columns:var(--zm-studio-columns)!important}
+html.zv-music-studio ytmusic-shelf-renderer #contents,html.zv-music-studio ytmusic-carousel-shelf-renderer #contents{display:grid!important;grid-template-columns:repeat(var(--zm-studio-columns),minmax(0,1fr))!important;grid-auto-flow:row!important;gap:20px!important;overflow:visible!important}
+@media(max-width:900px){html.zv-music-studio ytmusic-shelf-renderer #contents,html.zv-music-studio ytmusic-carousel-shelf-renderer #contents{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}}
+
+html.zv-music-studio.zv-music-studio-hide-navigation ytmusic-guide-renderer,html.zv-music-studio.zv-music-studio-hide-navigation #guide{display:none!important}

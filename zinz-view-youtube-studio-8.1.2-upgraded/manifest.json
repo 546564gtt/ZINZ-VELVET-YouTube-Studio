@@ -1,0 +1,110 @@
+{
+  "manifest_version": 2,
+  "name": "ZINZ / VELVET \u2014 Zen + Music",
+  "version": "8.1.2",
+  "description": "YouTube and YouTube Music customization with color studio, shareable profiles, layout controls, and hardened video scene analysis",
+  "options_ui": {
+    "page": "color-studio.html",
+    "open_in_tab": true
+  },
+  "permissions": [
+    "storage",
+    "*://www.youtube.com/*",
+    "*://youtube.com/*",
+    "*://m.youtube.com/*",
+    "*://www.youtube-nocookie.com/*"
+  ],
+  "browser_action": {
+    "default_title": "ZINZ / VELVET",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.youtube.com/*",
+        "*://youtube.com/*",
+        "*://m.youtube.com/*"
+      ],
+      "css": [
+        "velvet.css",
+        "theme.css",
+        "studio.css"
+      ],
+      "js": [
+        "content.js",
+        "theme-content.js",
+        "effects.js",
+        "analysis.js",
+        "pacing.js",
+        "color-palette.js",
+        "color-cpu.js",
+        "texturing.js",
+        "material.js",
+        "studio-content.js"
+      ],
+      "run_at": "document_start",
+      "exclude_matches": [
+        "*://www.youtube.com/embed/*",
+        "*://youtube.com/embed/*"
+      ]
+    },
+    {
+      "matches": [
+        "*://www.youtube.com/embed/*",
+        "*://youtube.com/embed/*",
+        "*://www.youtube-nocookie.com/embed/*"
+      ],
+      "js": [
+        "effects.js",
+        "analysis.js",
+        "pacing.js",
+        "color-palette.js",
+        "color-cpu.js",
+        "texturing.js",
+        "material.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "css": [
+        "music.css",
+        "theme.css",
+        "music-studio.css"
+      ],
+      "js": [
+        "music.js",
+        "theme-content.js",
+        "effects.js",
+        "analysis.js",
+        "pacing.js",
+        "color-palette.js",
+        "color-cpu.js",
+        "texturing.js",
+        "material.js",
+        "studio-content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "zinz-velvet@local.extension"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

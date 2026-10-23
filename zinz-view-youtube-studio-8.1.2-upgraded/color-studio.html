@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>ZINZ / VELVET — Color Studio</title>
+  <link rel="stylesheet" href="color-studio.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="brand-row"><span class="brand-mark">◈</span><span class="eyebrow">ZINZ / VELVET · FULL-PAGE EDITOR</span><span class="version">8.1</span></div>
+      <h1>Color <span>Studio</span></h1>
+      <p>Build a look that is actually yours. Pick colors in this tab, save named palettes, or export a complete setup with your effects and presets included.</p>
+      <div class="hero-tags"><span>Live color saving</span><span>Independent YouTube + Music palettes</span><span>Shareable JSON files</span></div>
+    </header>
+
+    <section class="card profile-card" aria-labelledby="profilesTitle">
+      <div class="section-heading">
+        <div><div class="eyebrow">PORTABILITY</div><h2 id="profilesTitle">Complete setup profiles</h2></div>
+        <span class="section-icon">⇄</span>
+      </div>
+      <p class="section-copy">A setup profile includes your enabled effects, effect values, selected presets, 76-target color adjustments, Material Depth, adaptive lighting, Auto Color, YouTube layout, YouTube Music layout, and saved color palettes.</p>
+      <div class="profile-create">
+        <label class="form-label" for="profileName">Name this setup</label>
+        <div class="input-action"><input id="profileName" type="text" maxlength="60" placeholder="e.g. Natural Color + Deep Violet" autocomplete="off"><button id="saveProfile" class="button primary" type="button">Save setup</button></div>
+      </div>
+      <div class="profile-manage">
+        <label class="form-label" for="savedProfileSelect">Saved setups</label>
+        <div class="input-action"><select id="savedProfileSelect"><option value="">No saved setups yet</option></select><button id="loadProfile" class="button" type="button">Load</button></div>
+        <div class="button-row">
+          <button id="updateProfile" class="button" type="button">Update selected</button>
+          <button id="deleteProfile" class="button quiet-danger" type="button">Delete</button>
+          <button id="exportSelectedProfile" class="button" type="button">Export selected</button>
+        </div>
+      </div>
+      <div class="transfer-row">
+        <div><strong>Share your whole setup</strong><small>Exports a JSON file your friend can import to restore the same saved configuration.</small></div>
+        <div class="button-row"><button id="exportCurrentProfile" class="button" type="button">Export current</button><label class="button file-button" for="profileImport">Import setup<input id="profileImport" type="file" accept=".json,application/json"></label></div>
+      </div>
+    </section>
+
+    <section class="card palette-card" aria-labelledby="paletteTitle">
+      <div class="section-heading">
+        <div><div class="eyebrow">COLOR PRESETS</div><h2 id="paletteTitle">Named color palettes</h2></div>
+        <span class="section-icon">◉</span>
+      </div>
+      <p class="section-copy">A palette changes colors only, so you can share your look without overwriting a friend's effects or video settings.</p>
+      <div class="palette-tools-grid">
+        <div><label class="form-label" for="paletteName">Palette name</label><div class="input-action"><input id="paletteName" type="text" maxlength="60" placeholder="e.g. Ocean Glass" autocomplete="off"><button id="savePalette" class="button primary" type="button">Save palette</button></div></div>
+        <div><label class="form-label" for="savedPaletteSelect">Saved palettes</label><div class="input-action"><select id="savedPaletteSelect"><option value="">No saved palettes yet</option></select><button id="applyPalette" class="button" type="button">Apply</button></div></div>
+      </div>
+      <div class="button-row palette-actions">
+        <label class="form-label palette-builtin-label" for="builtinPalette">Built-in look</label>
+        <select id="builtinPalette" class="builtin-select"><option value="VELVET">VELVET</option><option value="OLED">OLED Black</option><option value="Ocean">Ocean Glow</option><option value="Ember">Warm Ember</option><option value="Forest">Forest Glass</option><option value="Paper">Paper Light</option></select>
+        <button id="applyBuiltinPalette" class="button" type="button">Apply built-in</button>
+        <button id="exportPalette" class="button" type="button">Export palette</button>
+        <label class="button file-button" for="paletteImport">Import palette<input id="paletteImport" type="file" accept=".json,application/json"></label>
+        <button id="deletePalette" class="button quiet-danger" type="button">Delete selected</button>
+      </div>
+    </section>
+
+    <nav class="studio-tabs" aria-label="Choose the color menu">
+      <button type="button" class="studio-tab active" data-tab="youtube" aria-selected="true"><span class="tab-index">01</span><span><strong>YouTube</strong><small>Page · text · comments</small></span></button>
+      <button type="button" class="studio-tab" data-tab="music" aria-selected="false"><span class="tab-index">02</span><span><strong>YouTube Music</strong><small>Library · lyrics · player</small></span></button>
+    </nav>
+
+    <section class="tab-panel active" id="youtubeTab" aria-labelledby="youtubeTabTitle">
+      <div class="panel-title"><div><div class="eyebrow">MENU 01</div><h2 id="youtubeTabTitle">YouTube colors</h2><p>Change the main VELVET theme and YouTube's page-specific text, panels, links, comments, and playback progress separately.</p></div><div class="live-indicator"><span></span> Saves as you edit</div></div>
+      <section class="color-section">
+        <div class="color-section-heading"><div><h3>VELVET interface palette</h3><p>Base colors for the extension's YouTube visual theme.</p></div><select id="themePreset" aria-label="Apply built-in VELVET theme"><option value="Custom">Custom theme</option><option value="VELVET">VELVET</option><option value="Obsidian">Obsidian</option><option value="Amethyst">Amethyst</option><option value="Nocturne">Nocturne</option></select></div>
+        <div id="baseThemeColors" class="color-grid"></div>
+        <div class="palette-preview" id="basePreview"><div class="preview-window"><div class="preview-top"><span></span><span></span><span></span><b>Preview</b></div><div class="preview-layout"><div class="preview-art"></div><div class="preview-copy"><i></i><strong>Video title preview</strong><small>Channel name · views · metadata</small><div class="preview-progress"><span></span></div></div></div></div><div class="preview-label">Live palette sample</div></div>
+      </section>
+      <section class="color-section">
+        <div class="color-section-heading"><div><h3>YouTube page + text colors</h3><p>Video titles, regular text, comment copy, links, and panels each have their own color.</p></div></div>
+        <div id="ytColors" class="color-grid"></div>
+        <div class="palette-preview site-preview" id="ytPreview"><div class="site-preview-panel"><strong>Comments preview</strong><p class="preview-comment">This is how a comment looks using your independent comment-text color.</p><a href="#youtubeTab" tabindex="-1">Example link</a></div><div class="preview-label">Page, text and comment sample</div></div>
+      </section>
+    </section>
+
+    <section class="tab-panel" id="musicTab" aria-labelledby="musicTabTitle">
+      <div class="panel-title"><div><div class="eyebrow">MENU 02</div><h2 id="musicTabTitle">YouTube Music colors</h2><p>This palette is independent from YouTube, including track titles, metadata, lyrics, links, panels, and the playback bar.</p></div><div class="live-indicator"><span></span> Saves as you edit</div></div>
+      <section class="color-section">
+        <div class="color-section-heading"><div><h3>Music interface palette</h3><p>Color the library, player surfaces, text, lyrics, and progress separately.</p></div></div>
+        <div id="musicColors" class="color-grid"></div>
+        <div class="palette-preview music-preview" id="musicPreview"><div class="music-preview-panel"><div class="album-placeholder">♫</div><div class="track-preview"><strong>Track title preview</strong><small>Artist name · Album</small><p>Lyrics preview text</p><div class="preview-progress"><span></span></div></div></div><div class="preview-label">Music player sample</div></div>
+      </section>
+    </section>
+
+    <footer class="footer"><span class="brand-mark small">◈</span><span>Color changes save automatically. A palette shares colors only; a complete setup shares colors, effects, presets, and layout settings.</span><button id="resetColors" class="text-button" type="button">Reset colors</button></footer>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+  </main>
+  <script src="color-studio.js"></script>
+</body>
+</html>
