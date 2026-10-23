@@ -45,7 +45,22 @@
   const NEARBY=Array.from({length:360},(_,h)=>hueTargets.filter(t=>wrapDistance(h,t.h)<=t.radius));
   function fromOKRaw(L,a,b){const l=L+.3963377774*a+.2158037573*b,m=L-.1055613458*a-.0638541728*b,s=L-.0894841775*a-1.2914855480*b,l3=l*l*l,m3=m*m*m,s3=s*s*s;const lin=[4.0767416621*l3-3.3077115913*m3+.2309699292*s3,-1.2684380046*l3+2.6097574011*m3-.3413193965*s3,-.0041960863*l3-.7034186147*m3+1.7076147010*s3];return lin.map(x=>x<=.0031308?12.92*x:1.055*Math.pow(Math.max(0,x),1/2.4)-.055)}
   function fromOK(L,a,b){return fromOKRaw(L,a,b).map(x=>clamp(x,0,1))}
-  function hueWeights(rgb,active,p){
+  function hueWeights(rgb,active,p,activeHueCenters){
+    // Most pixels do not belong to a user-selected color band. Use a cheap RGB hue
+    // prefilter first; the wide guard band accounts for RGB/OKLab hue differences.
+    // Pixels near a selected band still go through the precise OKLab masks below.
+    if(activeHueCenters&&activeHueCenters.length>0&&activeHueCenters.length<50){
+      const r=rgb[0],g=rgb[1],b=rgb[2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;
+      if(d>.008){
+        let rh=mx===r?60*(((g-b)/d)%6):mx===g?60*((b-r)/d+2):60*((r-g)/d+4);
+        if(rh<0)rh+=360;
+        let possible=false;
+        for(let i=0;i<activeHueCenters.length;i++){
+          if(wrapDistance(rh,activeHueCenters[i])<=52){possible=true;break}
+        }
+        if(!possible)return rgb;
+      }else return rgb;
+    }
     const lab=toOK(rgb[0],rgb[1],rgb[2]),a=lab[1],b=lab[2],C=Math.hypot(a,b);let L=lab[0];
     if(C<.006)return rgb;
     let h=Math.atan2(b,a)*180/Math.PI;if(h<0)h+=360;
@@ -92,8 +107,13 @@
   function grade(data,p){
     if(!data||typeof data.length!=='number'||data.length%4)throw new TypeError('Expected RGBA pixel data');
     const targetCount=Math.max(26,globalThis.ZVColorPalette?.ALL?.length||p.hueShift?.length||26);
-    const active=new Uint8Array(targetCount);let anyTarget=false;
+    const active=new Uint8Array(targetCount),activeHueCenters=[];let anyTarget=false;
     for(let i=0;i<targetCount;i++){active[i]=Math.abs(p.hueShift[i]||0)>.001||Math.abs(p.hueSat[i]||0)>.001||Math.abs(p.hueLum[i]||0)>.001?1:0;anyTarget=anyTarget||!!active[i]}
+    if(anyTarget){
+      for(const t of hueTargets)if(active[t.i])activeHueCenters.push(t.h);
+      if(active[24])activeHueCenters.push(55);
+      if(active[25])activeHueCenters.push(53);
+    }
     const sat=p.sat,bright=p.bright,contrast=p.contrast,gamma=p.gamma,mul=p.mul,bias=p.bias,curve=p.curve;
     const curveIdentity=curve[0]===0&&curve[1]===.25&&curve[2]===.5&&curve[3]===.75&&curve[4]===1;
     const gammaIdentity=Math.abs(gamma-1)<1e-8,satIdentity=Math.abs(sat-1)<1e-8,brightIdentity=Math.abs(bright-1)<1e-8,contrastIdentity=Math.abs(contrast-1)<1e-8,mulIdentity=mul[0]===1&&mul[1]===1&&mul[2]===1&&bias===0;
@@ -107,7 +127,7 @@
       if(!gammaIdentity){const inv=1/gamma;r=Math.pow(Math.max(0,r),inv);g=Math.pow(Math.max(0,g),inv);b=Math.pow(Math.max(0,b),inv)}
       if(!curveIdentity){let q=clamp(r,0,1)*4,i=Math.min(Math.floor(q),3);r=curve[i]+(curve[i+1]-curve[i])*(q-i);q=clamp(g,0,1)*4;i=Math.min(Math.floor(q),3);g=curve[i]+(curve[i+1]-curve[i])*(q-i);q=clamp(b,0,1)*4;i=Math.min(Math.floor(q),3);b=curve[i]+(curve[i+1]-curve[i])*(q-i)}
       r=clamp(r,0,1);g=clamp(g,0,1);b=clamp(b,0,1);
-      if(anyTarget){const out=hueWeights([r,g,b],active,p);r=out[0];g=out[1];b=out[2]}
+      if(anyTarget){const out=hueWeights([r,g,b],active,p,activeHueCenters);r=out[0];g=out[1];b=out[2]}
       data[k]=Math.round(clamp(r,0,1)*255);data[k+1]=Math.round(clamp(g,0,1)*255);data[k+2]=Math.round(clamp(b,0,1)*255);
     }
     if(p.width&&((p.A||0)>.001||(p.B||0)>.001))applySpatialDetail(data,p);
