@@ -2,6 +2,11 @@
 
 ## 8.1.5
 
+- Route ordinary brightness, contrast, and saturation through native video filters rather than forcing the custom WebGL renderer.
+- Route selective color grading through the non-WebGL CPU color backend when pixel-level controls are active; reserve WebGL for the optional Material Depth path.
+- Extend the CPU backend to evaluate all 50 fine-spectrum targets alongside the 24 named targets and dedicated skin/earth masks.
+- Add a regression test covering all 50 fine-spectrum hue targets in CPU mode.
+
 - Cache WebGL uniform values by location and skip repeat uploads when a value is unchanged.
 - Reset the uniform cache whenever a renderer is initialized or torn down, and ignore optimized-out uniform locations safely.
 - Add regression checks for uniform caching and the existing WebGL1/analysis-buffer hot-path optimizations.
