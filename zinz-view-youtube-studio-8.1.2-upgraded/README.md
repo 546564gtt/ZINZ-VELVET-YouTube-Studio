@@ -1,4 +1,4 @@
-# ZINZ / VELVET 8.1.2 — YouTube + YouTube Music
+# ZINZ / VELVET 8.1.6 — YouTube + YouTube Music
 
 ## What's new in 8.1.0
 
@@ -7,7 +7,7 @@
 - **Named color palettes:** save any combination of YouTube and Music colors under a name, apply it later, and export/import it as a small JSON file without overwriting effects or layout settings.
 - **Complete setup profiles:** named profiles and JSON import/export include active effects and values, effect presets, targeted spectrum adjustments, Material Depth preset/settings, renderer and adaptive-lighting settings, Auto Color, YouTube layout settings, YouTube Music layout settings, and saved color palettes.
 - **Preset and reset controls:** built-in color looks include VELVET, OLED Black, Ocean Glow, Warm Ember, Forest Glass, and Paper Light. The original base-theme choices remain available.
-- **Everyday controls stay in the small popup:** effect sliders, renderer controls, Material Depth, visibility, scrolling, layout, Music behavior, and other non-color settings are still in the browser-action popup.
+- **Single-screen popup:** the tab strip and effect/renderer tabs have been removed. The compact dashboard focuses on appearance, accent colors, and quick access to YouTube customization. Detailed YouTube layout controls are tucked into an optional expandable section; the full-page Color Studio remains available.
 - **Automatic saving:** valid hex edits and color picker changes save immediately to extension storage and update matching open YouTube/YouTube Music tabs via their storage listeners.
 
 ## Install / update
@@ -42,3 +42,25 @@ The scene-analysis pipeline now skips malformed or incomplete frame readbacks ra
 - **Resolution-change handling:** motion history is reset when frame dimensions change, preventing invalid comparisons between different-sized thumbnails.
 - **Regression coverage:** tests now cover malformed frame rejection, recovery, and resized frames.
 - **Engineering handoff:** `ENGINEERING-HANDOFF.md` records implemented changes, checks, limitations, and the next focused upgrade steps.
+
+
+## What's new in 8.1.5
+
+- Route ordinary brightness, contrast, and saturation through native video filters instead of requiring the custom WebGL renderer.
+- Use the CPU color backend for selective-color controls, including all 50 fine-spectrum targets plus skin and earth masks.
+- Prefilter pixels far from active hue bands before precise OKLab grading to reduce unnecessary per-pixel work.
+- Reserve WebGL for optional Material Depth rendering when enabled; color controls alone no longer force it back on.
+- Performance and visual quality still need a live Zen/YouTube benchmark; the 60 FPS target is not claimed as guaranteed.
+
+- Cache unchanged WebGL uniform values per linked program, skipping redundant JavaScript-to-driver uniform updates while preserving per-program state.
+- Retain the 8.1.4 hot-path improvements: reusable WebGL1 texture storage and selective-color control buffers, cached frame parameters, and reusable scene-analysis staging buffers.
+- Add a dependency-free performance regression test for the render-path optimizations.
+- Browser GPU/CPU performance still needs measurement in Zen; no FPS gain is claimed without a live benchmark.
+
+
+## What's new in 8.1.6
+
+- Replace the multi-tab popup with a single-screen appearance dashboard and expandable advanced layout controls.
+- Keep the existing YouTube Color Studio and underlying video-enhancement modules available without putting their controls in the popup.
+- Refine YouTube spacing, thumbnail framing, search focus, navigation highlights, and watch-page surfaces for a more cohesive VELVET look.
+- Make popup control wiring tolerate removed optional controls so the simplified interface does not throw missing-element errors.
