@@ -46,6 +46,12 @@ The scene-analysis pipeline now skips malformed or incomplete frame readbacks ra
 
 ## What's new in 8.1.5
 
+- Route ordinary brightness, contrast, and saturation through native video filters instead of requiring the custom WebGL renderer.
+- Use the CPU color backend for selective-color controls, including all 50 fine-spectrum targets plus skin and earth masks.
+- Prefilter pixels far from active hue bands before precise OKLab grading to reduce unnecessary per-pixel work.
+- Reserve WebGL for optional Material Depth rendering when enabled; color controls alone no longer force it back on.
+- Performance and visual quality still need a live Zen/YouTube benchmark; the 60 FPS target is not claimed as guaranteed.
+
 - Cache unchanged WebGL uniform values per linked program, skipping redundant JavaScript-to-driver uniform updates while preserving per-program state.
 - Retain the 8.1.4 hot-path improvements: reusable WebGL1 texture storage and selective-color control buffers, cached frame parameters, and reusable scene-analysis staging buffers.
 - Add a dependency-free performance regression test for the render-path optimizations.
