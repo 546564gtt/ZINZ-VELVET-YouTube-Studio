@@ -1,4 +1,4 @@
-# ZINZ / VELVET 8.1.2 — YouTube + YouTube Music
+# ZINZ / VELVET 8.1.5 — YouTube + YouTube Music
 
 ## What's new in 8.1.0
 
@@ -42,3 +42,11 @@ The scene-analysis pipeline now skips malformed or incomplete frame readbacks ra
 - **Resolution-change handling:** motion history is reset when frame dimensions change, preventing invalid comparisons between different-sized thumbnails.
 - **Regression coverage:** tests now cover malformed frame rejection, recovery, and resized frames.
 - **Engineering handoff:** `ENGINEERING-HANDOFF.md` records implemented changes, checks, limitations, and the next focused upgrade steps.
+
+
+## What's new in 8.1.5
+
+- Cache unchanged WebGL uniform values per linked program, skipping redundant JavaScript-to-driver uniform updates while preserving per-program state.
+- Retain the 8.1.4 hot-path improvements: reusable WebGL1 texture storage and selective-color control buffers, cached frame parameters, and reusable scene-analysis staging buffers.
+- Add a dependency-free performance regression test for the render-path optimizations.
+- Browser GPU/CPU performance still needs measurement in Zen; no FPS gain is claimed without a live benchmark.
