@@ -446,8 +446,10 @@ function initCPUFallback(v,reason){
   notice('WebGL2 unavailable; using the CPU Canvas 2D Color Lab. Selective color needs readable video pixels. '+reason);
   console.info('[ZV TEXTURING] Canvas 2D selective-color fallback active:',reason);
 }
-function attach(v){vid=v;state='idle';ready=false;level=0;lastDrop=0;benchDone=true;benchIdx=0;bench={video:[],c2d:[],vf:[]};ingestM='video';slowStrikes=0;qualityWarmupAt=performance.now();qualityWarmupDone=false;lastCheck=qualityWarmupAt;gov.bad=0;gov.cleanSince=0;gov.lastStep=0;gpuSamples.length=0;probeList=[];probeDone=false;lastProbe=0;analysisReadbackReady=false;probeTries=0;lastT=-1;histValid=false;layoutDirty=true;lastOn=null;pace.reset();canvas=document.createElement('canvas');canvas.id='zv-gl';canvas.style.display='none';v.after(canvas);
-  rendererMode='gl';try{initGL()}catch(e){try{if(/running on the CPU/.test(e.message))throw new Error('Software GL path refused by performance guard');initGL1Fallback(v,e.message)}catch(gl1Err){try{initCPUFallback(v,e.message+'; WebGL1 unavailable: '+gl1Err.message)}catch(cpuErr){return fail(e.message+'; WebGL1 fallback: '+gl1Err.message+'; Canvas 2D fallback unavailable: '+cpuErr.message)}}}
+function attach(v,forceCPU=false){vid=v;state='idle';ready=false;level=0;lastDrop=0;benchDone=true;benchIdx=0;bench={video:[],c2d:[],vf:[]};ingestM='video';slowStrikes=0;qualityWarmupAt=performance.now();qualityWarmupDone=false;lastCheck=qualityWarmupAt;gov.bad=0;gov.cleanSince=0;gov.lastStep=0;gpuSamples.length=0;probeList=[];probeDone=false;lastProbe=0;analysisReadbackReady=false;probeTries=0;lastT=-1;histValid=false;layoutDirty=true;lastOn=null;pace.reset();canvas=document.createElement('canvas');canvas.id='zv-gl';canvas.style.display='none';v.after(canvas);
+  rendererMode='gl';
+  if(forceCPU){try{initCPUFallback(v,'CPU color mode selected; custom WebGL is reserved for Material Depth')}catch(cpuErr){return fail('Canvas 2D color processor unavailable: '+cpuErr.message)}}
+  else try{initGL()}catch(e){try{if(/running on the CPU/.test(e.message))throw new Error('Software GL path refused by performance guard');initGL1Fallback(v,e.message)}catch(gl1Err){try{initCPUFallback(v,e.message+'; WebGL1 unavailable: '+gl1Err.message)}catch(cpuErr){return fail(e.message+'; WebGL1 fallback: '+gl1Err.message+'; Canvas 2D fallback unavailable: '+cpuErr.message)}}}
   v.addEventListener('emptied',()=>{histValid=false;lastOn=null;globalThis.ZVAnalysis?.reset();ana.valid=false;ana.illInit=false;lp=null;ready=false;if(canvas)canvas.style.display='none'});
   hasRvfc='requestVideoFrameCallback' in v;if(hasRvfc){/* Render INSIDE the frame callback: every presented video frame gets its own render in the same frame cycle (no flag that can coalesce two frames into one). */
     const cb=(now,meta)=>{newFrame=true;pace.note(now,meta);rvfcId=v.requestVideoFrameCallback(cb);if(v===vid&&canvas&&state==='on'&&!document.hidden)frameBody(now)};rvfcId=v.requestVideoFrameCallback(cb)}/* no rVFC (Firefox <132): loop() polls currentTime instead */
@@ -484,13 +486,22 @@ function checkQuality(now){
   const gpuP95=gpuSamples.length?gpuSamples.slice().sort((a,b)=>a-b)[Math.floor((gpuSamples.length-1)*.95)]:0;const step=ZVPace.decide(gov,{now,level,p95:Math.max(pace.cpu.p(.95),gpuP95),dropDelta,lock:!!cfg.perf.lock});
   if(step){level=Math.max(0,Math.min(2,level+step));dirty=true}}
 
+function needsCpuColor(f){
+  if(!f?.enabled)return false;
+  const pixelControls=['sharp','gamma','highlights','shadows','warmth','tint','redBalance','greenBalance','blueBalance','blackPoint','whitePoint','fade'];
+  if(pixelControls.some(k=>Math.abs(Number(f[k])||0)>.001))return true;
+  return Object.values(f.targetColors||{}).some(t=>Math.abs(Number(t?.hue)||0)>.001||Math.abs(Number(t?.sat)||0)>.001||Math.abs(Number(t?.lum)||0)>.001);
+}
 function maintain(){
-  if(fx.enabled&&!cfg.gl){cfg={...cfg,gl:true};browser.storage.local.set({[CFG_KEY]:cfg}).catch(()=>{});dirty=true}
-  if(!cfg.gl){if(state==='on'||canvas)teardown();return null}
+  // Basic brightness/contrast/saturation stay on the browser's native video filter path.
+  // Selective/advanced color grading uses the CPU backend; WebGL is reserved for Material Depth.
+  if(!md.enabled&&!needsCpuColor(fx)){if(canvas)teardown();return null}
   if(document.hidden)return null;
   const v=document.querySelector(SEL);if(!v){if(canvas)teardown();return null}
   if(state.startsWith('failed')&&v.currentSrc&&v.currentSrc!==failSrc&&v.readyState>=1&&slowFails<2&&!/CPU/.test(failWhy))state='idle';/* new video: retry once */
-  if(v!==vid||(!canvas&&!state.startsWith('failed'))){if(canvas)teardown();attach(v)}
+  const wantGL=!!md.enabled&&!!cfg.gl;
+  const modeMismatch=wantGL?(rendererMode==='2d'&&state!=='on'):rendererMode!=='2d';
+  if(v!==vid||!canvas||modeMismatch){if(canvas)teardown();attach(v,!wantGL)}
   return v}
 /* The per-frame work. Called from the video-frame callback (one call per presented frame) and from the rAF loop (settings changes, resizes, paused video). */
 function frameBodyCPU(now){
@@ -555,10 +566,10 @@ function load(){document.documentElement.append(css);const keys=['zinzVelvetEffe
       }
       browser.storage.local.set(migration).catch(()=>{});
     }
-    if(fx.enabled&&!cfg.gl){cfg={...cfg,gl:true};browser.storage.local.set({[CFG_KEY]:cfg}).catch(()=>{})}
+    
     P=buildParams();requestAnimationFrame(loop)
   }).catch(()=>requestAnimationFrame(loop));
-  browser.storage.onChanged.addListener((c,a)=>{if(a!=='local')return;if(c.zinzVelvetEffects)fx={...FXD,...c.zinzVelvetEffects.newValue,targetColors:{...FXD.targetColors,...(c.zinzVelvetEffects.newValue?.targetColors||{})}};if(c.zinzMaterialDepth)md={...MDD,...c.zinzMaterialDepth.newValue};if(c[CFG_KEY]){cfg=mergeCfg(cfg,c[CFG_KEY].newValue);cfg.perf.bench=0;cfg.perf.ingest=0}if(c.zinzVelvetEffects||c.zinzMaterialDepth){hueLutDirty=true;if(compatGL1)compatGL1.controlsDirty=true;}if(fx.enabled&&!cfg.gl){cfg={...cfg,gl:true};browser.storage.local.set({[CFG_KEY]:cfg}).catch(()=>{})}P=buildParams();dirty=true});
+  browser.storage.onChanged.addListener((c,a)=>{if(a!=='local')return;if(c.zinzVelvetEffects)fx={...FXD,...c.zinzVelvetEffects.newValue,targetColors:{...FXD.targetColors,...(c.zinzVelvetEffects.newValue?.targetColors||{})}};if(c.zinzMaterialDepth)md={...MDD,...c.zinzMaterialDepth.newValue};if(c[CFG_KEY]){cfg=mergeCfg(cfg,c[CFG_KEY].newValue);cfg.perf.bench=0;cfg.perf.ingest=0}if(c.zinzVelvetEffects||c.zinzMaterialDepth){hueLutDirty=true;if(compatGL1)compatGL1.controlsDirty=true;}P=buildParams();dirty=true});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden){histValid=false;globalThis.ZVAnalysis?.reset();ana.valid=false;ana.illInit=false;analysisReadbackReady=false;lp=null;newFrame=true;dirty=true}});
   document.addEventListener('fullscreenchange',()=>{dirty=true;newFrame=true;layoutDirty=true});window.addEventListener('resize',()=>{dirty=true;layoutDirty=true});
   document.addEventListener('keydown',e=>{if(!e.altKey||e.ctrlKey||e.metaKey)return;const k=e.code;
