@@ -23,7 +23,7 @@ globalThis.__ZVDebug={get ingest(){return ingestM},get benchDone(){return benchD
 let failWhy='',ingestM='video',benchDone=false,benchIdx=0,bench={video:[],c2d:[],vf:[]},benchRes=null,c2dC=null,c2dX=null,glRenderer='',slowStrikes=0,slowFails=0;
 let rendererMode='gl',cpu2d=null,cpuTargetCap=(navigator.hardwareConcurrency||4)>=8?480:420,cpuSlow=0,cpuFast=0,cpuFrameAvg=0,compatGL1=null;
 let hueLutDirty=true,videoTexW=2,videoTexH=2,uploadTextureSize=null,gpuTimerExt=null,gpuTimerActive=null,gpuTimerQueue=[],gpuMs=0;const gpuSamples=[];
-let layoutDirty=true,lastOn=null,mo=null,probeTries=0,srcW=0,srcH=0,upMs=0,lastLayoutPoke=0,pendingU=null,uScheduled=false;
+let layoutDirty=true,lastOn=null,mo=null,probeTries=0,srcW=0,srcH=0,upMs=0,lastLayoutPoke=0,pendingU=false,pendingEnergy=false,uScheduled=false;
 let tdIdx=0,histValid=false,lastCutSeen=0,tdOn=false,tdStr=0,hfOK=false,upOn=false,lastCW=0,lastCH=0,useGF=false;let probeList=[],probeDone=false,probeFbo=null,lastProbe=0,analysisReadbackReady=false,failSrc='',rvfcId=0,hasRvfc=false,lastT=-1,ro=null;
 let lastHud=0,progs={},tex={},fbo={},vao=null,frameMs=0,rendered=0,lastDrop=0,lastCheck=0,cleanSince=0;
 // Video start-up includes shader compilation, framebuffer allocation and texture warm-up. Exclude it from steady-state lag scoring.
@@ -234,7 +234,7 @@ precision highp float;in vec2 v;out vec4 o;uniform sampler2D t;uniform vec2 grid
 void main(){vec2 c=floor(gl_FragCoord.xy);vec3 a=vec3(0.);float mx=0.;
 for(int j=0;j<8;j++)for(int i=0;i<8;i++){vec2 uv=(c+(vec2(float(i),float(j))+.5)/8.)/grid;vec3 s=texture(t,uv).rgb;a+=pow(s,vec3(2.2));mx=max(mx,dot(s,vec3(.2126,.7152,.0722)));}
 o=vec4(pow(a/64.,vec3(1./2.2)),mx);}`;
-const AW=64,AH=36;let ana={fence:null,pbo:null,buf:new Uint8Array(AW*AH*4),ebuf:new Uint8Array(AW*AH*4),tick:0,valid:false,illI:0,illInit:false,snap:false,lastCut:0,eneFresh:false};let lp=null,illTex=null;
+const AW=64,AH=36;let ana={fence:null,pbo:null,buf:new Uint8Array(AW*AH*4),ebuf:new Uint8Array(AW*AH*4),tick:0,valid:false,illI:0,illInit:false,snap:false,lastCut:0,eneFresh:false};const pendingAnalysisBuf=new Uint8Array(AW*AH*4),pendingEnergyBuf=new Uint8Array(AW*AH*4);let lp=null,illTex=null;
 function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
 function prog(fs){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,VS));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const raw=gl.getActiveUniform(p,i).name;const nm=raw.replace(/\[0\]$/,'');/* Query array uniforms by their explicit [0] name. Some WebGL drivers return null for the bare array name, silently disabling curves/color bands. */u[nm]=gl.getUniformLocation(p,raw)}return {p,u}}
 function mkTex(w,h,hf){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);const fmt=hf==='f32'&&hfOK?gl.RGBA32F:(hf&&hfOK?gl.RGBA16F:gl.RGBA8);gl.texStorage2D(gl.TEXTURE_2D,1,fmt,w,h);for(const [k,v] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);if(hf==='f32'&&hfOK){gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST)}return t}
@@ -273,10 +273,11 @@ function startAnalysis(withEnergy){pass(progs.ana,fbo.ana,AW,AH,u=>{bindTex(0,te
   gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);ana.valid=true;ana.fence=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush()}
 function pollAnalysis(){if(!ana.fence||!gl)return;const st=gl.clientWaitSync(ana.fence,0,0);if(st===gl.TIMEOUT_EXPIRED)return;gl.deleteSync(ana.fence);ana.fence=null;
   if(st===gl.WAIT_FAILED)return;gl.bindBuffer(gl.PIXEL_PACK_BUFFER,ana.pbo);gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,0,ana.buf);if(ana.eneFresh)gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,AW*AH*4,ana.ebuf);gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);analysisReadbackReady=true;
-  queueUpdate(ana.buf.slice(),ana.eneFresh?ana.ebuf.slice():undefined)}
+  queueUpdate(ana.buf,ana.eneFresh?ana.ebuf:undefined)}
 /* The statistics pass (~2 ms of JS) runs when the main thread is idle instead of inside the frame; newest result wins. */
-function queueUpdate(b,e){pendingU=[b,e];if(uScheduled)return;uScheduled=true;
-  const run=()=>{uScheduled=false;const q=pendingU;pendingU=null;const Z=globalThis.ZVAnalysis;if(!q||!Z||!gl)return;const S=Z.update(q[0],AW,AH,q[1]);if(S.cutCount!==ana.lastCut){ana.lastCut=S.cutCount;ana.snap=true}};
+/* The statistics pass runs when the main thread is idle. Reuse fixed buffers so analysis does not allocate fresh arrays for every sample. */
+function queueUpdate(b,e){pendingAnalysisBuf.set(b);pendingEnergy=!!e;if(e)pendingEnergyBuf.set(e);pendingU=true;if(uScheduled)return;uScheduled=true;
+  const run=()=>{uScheduled=false;if(!pendingU)return;pendingU=false;const Z=globalThis.ZVAnalysis;if(!Z||!gl)return;const S=Z.update(pendingAnalysisBuf,AW,AH,pendingEnergy?pendingEnergyBuf:undefined);if(S.cutCount!==ana.lastCut){ana.lastCut=S.cutCount;ana.snap=true}};
   if(typeof requestIdleCallback==='function')requestIdleCallback(run,{timeout:80});else setTimeout(run,0)}
 const LK=['shadow','anchor','illAmt','illTarget','knee','core','damp'];
 function toneWhite(){let w=0;for(let i=0;i<3;i++){let c=Math.min(2,P.bright);c=Math.min(2,Math.max(0,(c-.5)*P.contrast+.5));c=Math.min(2,Math.max(0,c*P.mul[i]+P.bias));c=Math.pow(c,1/P.gamma);w=Math.max(w,c)}return w}
@@ -395,23 +396,25 @@ function initGL1Fallback(v,reason){
   gl.useProgram(program);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
   const aPos=gl.getAttribLocation(program,'aPosition');gl.enableVertexAttribArray(aPos);gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
   const videoTex=gl.createTexture();gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,videoTex);for(const [k,val] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,val);gl.uniform1i(gl.getUniformLocation(program,'uVideo'),0);
-  const ctrlTex=gl.createTexture();gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,ctrlTex);for(const [k,val] of [[gl.TEXTURE_MIN_FILTER,gl.NEAREST],[gl.TEXTURE_MAG_FILTER,gl.NEAREST],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,val);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,26,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array(26*4));gl.uniform1i(gl.getUniformLocation(program,'uControls'),1);
+  const controls=new Uint8Array(26*4);for(let i=0;i<26;i++){controls[i*4]=128;controls[i*4+1]=128;controls[i*4+2]=128;controls[i*4+3]=255}
+  const ctrlTex=gl.createTexture();gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,ctrlTex);for(const [k,val] of [[gl.TEXTURE_MIN_FILTER,gl.NEAREST],[gl.TEXTURE_MAG_FILTER,gl.NEAREST],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,val);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,26,1,0,gl.RGBA,gl.UNSIGNED_BYTE,controls);gl.uniform1i(gl.getUniformLocation(program,'uControls'),1);
   const uniforms={};for(const n of ['uSat','uBright','uContrast','uGamma','uBias','uShadow','uHighlights','uMul','uHasTargets','uDetailFine','uDetailMid','uTexel'])uniforms[n]=gl.getUniformLocation(program,n);
-  compatGL1={program,buffer,aPos,videoTex,ctrlTex,uniforms,textureMax:Number(gl.getParameter(gl.MAX_TEXTURE_SIZE))||4096};rendererMode='webgl1';cpu2d=null;lastW=lastH=lastCW=lastCH=0;ready=false;dirty=true;newFrame=true;
+  compatGL1={program,buffer,aPos,videoTex,ctrlTex,controls,controlsDirty:true,videoW:0,videoH:0,uniforms,textureMax:Number(gl.getParameter(gl.MAX_TEXTURE_SIZE))||4096};rendererMode='webgl1';cpu2d=null;lastW=lastH=lastCW=lastCH=0;ready=false;dirty=true;newFrame=true;
   notice('WebGL2 is unavailable; using the WebGL1 Color Lab. All 26 selective targets work without WebGL2. '+reason);
   console.info('[ZV TEXTURING] WebGL1 selective-color renderer active:',reason);
 }
 function frameBodyGL1(now){
-  const v=vid;if(state!=='on'||rendererMode!=='webgl1'||!compatGL1)return;P=buildParams();
+  const v=vid;if(state!=='on'||rendererMode!=='webgl1'||!compatGL1)return;P=P||buildParams();
   if(!P.active||v.readyState<2||!v.videoWidth){setOn(false);return}
   if(!hasRvfc&&v.currentTime!==lastT){lastT=v.currentTime;newFrame=true}if(!newFrame&&!dirty&&ready)return;
   const t0=performance.now();try{
     if(layoutDirty){layout();layoutDirty=false}
     const cap=Math.min(2560,compatGL1.textureMax),w=Math.max(2,Math.min(v.videoWidth,cap)),h=Math.max(2,Math.round(v.videoHeight*w/v.videoWidth));
     if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;lastW=w;lastH=h;lastCW=w;lastCH=h}
-    const c=compatGL1;gl.viewport(0,0,w,h);gl.useProgram(c.program);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,c.videoTex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,v);
-    const controls=new Uint8Array(26*4);for(let i=0;i<26;i++){controls[i*4]=Math.round((clamp(P.hueShift[i],-100,100)+100)*255/200);controls[i*4+1]=Math.round((clamp(P.hueSat[i],-100,100)+100)*255/200);controls[i*4+2]=Math.round((clamp(P.hueLum[i],-100,100)+100)*255/200);controls[i*4+3]=255}
-    gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,c.ctrlTex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,26,1,0,gl.RGBA,gl.UNSIGNED_BYTE,controls);
+    const c=compatGL1;gl.viewport(0,0,w,h);gl.useProgram(c.program);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,c.videoTex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+    if(c.videoW!==v.videoWidth||c.videoH!==v.videoHeight){gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,v);c.videoW=v.videoWidth;c.videoH=v.videoHeight}else gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,gl.RGBA,gl.UNSIGNED_BYTE,v);
+    if(c.controlsDirty){for(let i=0;i<26;i++){c.controls[i*4]=Math.round((clamp(P.hueShift[i],-100,100)+100)*255/200);c.controls[i*4+1]=Math.round((clamp(P.hueSat[i],-100,100)+100)*255/200);c.controls[i*4+2]=Math.round((clamp(P.hueLum[i],-100,100)+100)*255/200);c.controls[i*4+3]=255}
+      gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,c.ctrlTex);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,26,1,gl.RGBA,gl.UNSIGNED_BYTE,c.controls);c.controlsDirty=false;}
     const u=c.uniforms;gl.uniform1f(u.uSat,P.sat);gl.uniform1f(u.uBright,P.bright);gl.uniform1f(u.uContrast,P.contrast);gl.uniform1f(u.uGamma,P.gamma);gl.uniform1f(u.uBias,P.bias);gl.uniform3f(u.uMul,P.mul[0],P.mul[1],P.mul[2]);gl.uniform1f(u.uShadow,clamp(fx.shadows,-60,60)/100);gl.uniform1f(u.uHighlights,clamp(fx.highlights,-60,60)/100);gl.uniform1f(u.uHasTargets,P.hasTargets?1:0);gl.uniform1f(u.uDetailFine,P.A);gl.uniform1f(u.uDetailMid,P.B);gl.uniform2f(u.uTexel,1/w,1/h);gl.drawArrays(gl.TRIANGLES,0,3);
     if(!probeDone&&now-lastProbe>=1000&&v.currentTime>0){lastProbe=now;probeTries++;let mx=0;const pix=new Uint8Array(4*4*4);for(const [px,py] of [[.25,.25],[.75,.25],[.5,.5],[.25,.75],[.75,.75]]){gl.readPixels(Math.max(0,Math.floor(w*px)-2),Math.max(0,Math.floor(h*py)-2),4,4,gl.RGBA,gl.UNSIGNED_BYTE,pix);for(let j=0;j<pix.length;j+=4)mx=Math.max(mx,pix[j],pix[j+1],pix[j+2])}probeList.push({t:v.currentTime,max:mx});if(probeList.length>12)probeList.shift();const verdict=globalThis.ZVAnalysis?.probeVerdict?.(probeList,!!v.mediaKeys);if(verdict==='black')throw new Error(v.mediaKeys?'protected video (EME) renders black':'video samples remain black; disabled overlay to preserve native playback');if(verdict==='ok'||probeTries>=12)probeDone=true}
     const dt=performance.now()-t0;frameMs=frameMs*.9+dt*.1;pace.cpu.push(dt);rendered++;setOn(true);ready=true;if(now-lastHud>500||!hud){lastHud=now;updateHud()}newFrame=false;dirty=false;
@@ -483,7 +486,7 @@ function maintain(){
 /* The per-frame work. Called from the video-frame callback (one call per presented frame) and from the rAF loop (settings changes, resizes, paused video). */
 function frameBodyCPU(now){
   const v=vid;if(state!=='on'||rendererMode!=='2d'||!cpu2d)return;
-  P=buildParams();
+  P=P||buildParams();
   if(!P.active||v.readyState<2||!v.videoWidth){setOn(false);return}
   if(!hasRvfc&&v.currentTime!==lastT){lastT=v.currentTime;newFrame=true}
   if(!newFrame&&!dirty&&ready)return;
@@ -546,7 +549,7 @@ function load(){document.documentElement.append(css);const keys=['zinzVelvetEffe
     if(fx.enabled&&!cfg.gl){cfg={...cfg,gl:true};browser.storage.local.set({[CFG_KEY]:cfg}).catch(()=>{})}
     P=buildParams();requestAnimationFrame(loop)
   }).catch(()=>requestAnimationFrame(loop));
-  browser.storage.onChanged.addListener((c,a)=>{if(a!=='local')return;if(c.zinzVelvetEffects)fx={...FXD,...c.zinzVelvetEffects.newValue,targetColors:{...FXD.targetColors,...(c.zinzVelvetEffects.newValue?.targetColors||{})}};if(c.zinzMaterialDepth)md={...MDD,...c.zinzMaterialDepth.newValue};if(c[CFG_KEY]){cfg=mergeCfg(cfg,c[CFG_KEY].newValue);cfg.perf.bench=0;cfg.perf.ingest=0}if(c.zinzVelvetEffects||c.zinzMaterialDepth)hueLutDirty=true;if(fx.enabled&&!cfg.gl){cfg={...cfg,gl:true};browser.storage.local.set({[CFG_KEY]:cfg}).catch(()=>{})}P=buildParams();dirty=true});
+  browser.storage.onChanged.addListener((c,a)=>{if(a!=='local')return;if(c.zinzVelvetEffects)fx={...FXD,...c.zinzVelvetEffects.newValue,targetColors:{...FXD.targetColors,...(c.zinzVelvetEffects.newValue?.targetColors||{})}};if(c.zinzMaterialDepth)md={...MDD,...c.zinzMaterialDepth.newValue};if(c[CFG_KEY]){cfg=mergeCfg(cfg,c[CFG_KEY].newValue);cfg.perf.bench=0;cfg.perf.ingest=0}if(c.zinzVelvetEffects||c.zinzMaterialDepth){hueLutDirty=true;if(compatGL1)compatGL1.controlsDirty=true;}if(fx.enabled&&!cfg.gl){cfg={...cfg,gl:true};browser.storage.local.set({[CFG_KEY]:cfg}).catch(()=>{})}P=buildParams();dirty=true});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden){histValid=false;globalThis.ZVAnalysis?.reset();ana.valid=false;ana.illInit=false;analysisReadbackReady=false;lp=null;newFrame=true;dirty=true}});
   document.addEventListener('fullscreenchange',()=>{dirty=true;newFrame=true;layoutDirty=true});window.addEventListener('resize',()=>{dirty=true;layoutDirty=true});
   document.addEventListener('keydown',e=>{if(!e.altKey||e.ctrlKey||e.metaKey)return;const k=e.code;
