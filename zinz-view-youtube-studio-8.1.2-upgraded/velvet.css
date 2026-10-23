@@ -80,3 +80,27 @@ html.zv.zv-watch-focus ytd-watch-flexy:not([theater]) #secondary{opacity:.66;tra
 html.zv.zv-watch-focus ytd-watch-flexy:not([theater]) #secondary:hover,
 html.zv.zv-watch-focus ytd-watch-flexy:not([theater]) #secondary:focus-within{opacity:1}
 @media(prefers-reduced-motion:reduce){html.zv.zv-watch-focus ytd-watch-flexy #secondary{transition:none!important}}
+
+/* VELVET UI refinement: consistent spacing, quieter surfaces, and a cleaner watch layout. */
+html.zv{--zv-radius:16px;--zv-line:rgba(var(--zv-rgb),.15)}
+html.zv #masthead-container{background:rgba(13,10,21,.84)!important;border-bottom-color:rgba(var(--zv-rgb),.16)!important;box-shadow:0 8px 32px #0002}
+html.zv #center.ytd-masthead #container.ytd-searchbox:focus-within,html.zv ytd-searchbox:focus-within #container{border-color:rgba(var(--zv-rgb),.6)!important;box-shadow:0 0 0 3px rgba(var(--zv-rgb),.09),inset 0 2px 7px #0004!important}
+html.zv ytd-rich-grid-renderer #contents{column-gap:22px!important;row-gap:30px!important}
+html.zv ytd-rich-grid-media,html.zv ytd-video-renderer,html.zv ytd-compact-video-renderer{background:transparent!important}
+html.zv ytd-rich-grid-media #details{padding:9px 2px 0!important}
+html.zv ytd-rich-grid-media #video-title,html.zv ytd-video-renderer #video-title{line-height:1.42!important}
+html.zv ytd-thumbnail #thumbnail,html.zv ytd-playlist-thumbnail #thumbnail{box-shadow:0 8px 24px #0003;border-color:rgba(255,255,255,.08)!important}
+html.zv ytd-rich-grid-media:hover ytd-thumbnail #thumbnail{border-color:rgba(var(--zv-rgb),.42)!important;box-shadow:0 12px 32px rgba(0,0,0,.38),0 0 0 1px rgba(var(--zv-rgb),.12)}
+html.zv ytd-watch-flexy #primary-inner,html.zv ytd-watch-flexy #secondary-inner{padding-top:19px}
+html.zv ytd-watch-metadata #title h1,html.zv ytd-watch-metadata h1{line-height:1.25!important;letter-spacing:-.45px!important}
+html.zv ytd-watch-metadata #top-row,html.zv ytd-watch-metadata #bottom-row{gap:10px}
+html.zv ytd-watch-metadata #description,html.zv ytd-comments #header{border-color:rgba(var(--zv-rgb),.13)!important}
+html.zv ytd-watch-flexy #secondary ytd-compact-video-renderer{border:1px solid transparent!important;border-radius:12px!important}
+html.zv ytd-watch-flexy #secondary ytd-compact-video-renderer:hover{border-color:rgba(var(--zv-rgb),.16)!important;background:rgba(var(--zv-rgb),.045)!important}
+html.zv ytd-guide-renderer,html.zv #guide-content{scrollbar-width:thin}
+html.zv ytd-guide-entry-renderer[active],html.zv ytd-mini-guide-entry-renderer[active]{box-shadow:inset 2px 0 var(--zv-accent)}
+html.zv yt-chip-cloud-chip-renderer{padding-inline:13px!important}
+html.zv .ytp-play-progress,html.zv .ytp-scrubber-button{background:var(--zv-accent)!important}
+html.zv :is(ytd-menu-popup-renderer,tp-yt-paper-dialog,ytd-popup-container tp-yt-paper-dialog){border-color:rgba(var(--zv-rgb),.2)!important}
+@media(max-width:700px){html.zv ytd-rich-grid-renderer #contents{column-gap:12px!important;row-gap:20px!important}html.zv ytd-watch-flexy #primary-inner,html.zv ytd-watch-flexy #secondary-inner{padding-top:10px}}
+@media(prefers-reduced-motion:reduce){html.zv ytd-rich-grid-media,html.zv ytd-thumbnail img,html.zv #zv-shorts{transition:none!important}}
