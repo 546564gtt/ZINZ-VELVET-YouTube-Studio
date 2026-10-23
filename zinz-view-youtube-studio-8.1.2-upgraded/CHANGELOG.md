@@ -1,5 +1,13 @@
 # Changelog
 
+## 8.1.6
+
+- Replace the six-tab popup with a compact, single-screen UI dashboard focused on YouTube appearance.
+- Move detailed YouTube layout settings into an optional expandable section; retain the separate full-page Color Studio.
+- Refine YouTube feed spacing, thumbnails, search focus, navigation highlights, and watch-page card styling.
+- Make popup event wiring safe when optional controls are not present.
+
+
 ## 8.1.5
 
 - Route ordinary brightness, contrast, and saturation through native video filters rather than forcing the custom WebGL renderer.
