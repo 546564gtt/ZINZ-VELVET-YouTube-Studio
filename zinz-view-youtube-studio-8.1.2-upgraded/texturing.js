@@ -500,7 +500,7 @@ function maintain(){
   const v=document.querySelector(SEL);if(!v){if(canvas)teardown();return null}
   if(state.startsWith('failed')&&v.currentSrc&&v.currentSrc!==failSrc&&v.readyState>=1&&slowFails<2&&!/CPU/.test(failWhy))state='idle';/* new video: retry once */
   const wantGL=!!md.enabled&&!!cfg.gl;
-  const modeMismatch=wantGL?(rendererMode==='2d'&&state!=='on'):rendererMode!=='2d';
+  const modeMismatch=wantGL?rendererMode==='2d':rendererMode!=='2d';
   if(v!==vid||!canvas||modeMismatch){if(canvas)teardown();attach(v,!wantGL)}
   return v}
 /* The per-frame work. Called from the video-frame callback (one call per presented frame) and from the rAF loop (settings changes, resizes, paused video). */
