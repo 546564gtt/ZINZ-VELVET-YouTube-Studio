@@ -21,7 +21,7 @@ let vid=null,canvas=null,gl=null,hud=null,P=null,ready=false,lastW=0,lastH=0;
 const pace=new ZVPace.Pace(),gov={bad:0,lastStep:0,cleanSince:0};
 globalThis.__ZVDebug={get ingest(){return ingestM},get benchDone(){return benchDone},get bench(){return benchRes},get renderer(){return glRenderer},get rendererMode(){return rendererMode},get cpuTargetCap(){return cpuTargetCap},get state(){return state},get level(){return level},get pace(){return pace},get colorTargetCount(){return COLOR_TARGETS.length},get gpuMs(){return gpuMs},get gpuTimerAvailable(){return !!gpuTimerExt}};/* read-only hook for tests/smoke_texturing.js */
 let failWhy='',ingestM='video',benchDone=false,benchIdx=0,bench={video:[],c2d:[],vf:[]},benchRes=null,c2dC=null,c2dX=null,glRenderer='',slowStrikes=0,slowFails=0;
-let rendererMode='gl',cpu2d=null,cpuTargetCap=(navigator.hardwareConcurrency||4)>=8?480:420,cpuSlow=0,cpuFast=0,cpuFrameAvg=0,compatGL1=null;
+let rendererMode='gl',cpu2d=null,cpuFallbackFromGL=false,cpuTargetCap=(navigator.hardwareConcurrency||4)>=8?480:420,cpuSlow=0,cpuFast=0,cpuFrameAvg=0,compatGL1=null;
 let hueLutDirty=true,videoTexW=2,videoTexH=2,uploadTextureSize=null,gpuTimerExt=null,gpuTimerActive=null,gpuTimerQueue=[],gpuMs=0;const gpuSamples=[];
 let layoutDirty=true,lastOn=null,mo=null,probeTries=0,srcW=0,srcH=0,upMs=0,lastLayoutPoke=0,pendingU=false,pendingEnergy=false,uScheduled=false;
 let tdIdx=0,histValid=false,lastCutSeen=0,tdOn=false,tdStr=0,hfOK=false,upOn=false,lastCW=0,lastCH=0,useGF=false;let probeList=[],probeDone=false,probeFbo=null,lastProbe=0,analysisReadbackReady=false,failSrc='',rvfcId=0,hasRvfc=false,lastT=-1,ro=null;
@@ -433,9 +433,10 @@ function frameBodyGL1(now){
 const css=document.createElement('style');css.id='zv-gl-css';
 css.textContent='html[data-zv-gl="on"] video.html5-main-video,html[data-zv-gl="on"] ytmusic-player video{filter:none !important}#zv-gl{position:absolute;z-index:1;pointer-events:none;max-width:none;max-height:none}#zv-hud{position:absolute;left:8px;top:8px;z-index:9999;font:11px/1.4 monospace;color:#fff;background:rgba(0,0,0,.6);padding:4px 7px;border-radius:4px;pointer-events:none;white-space:pre}';
 function setOn(on){if(on===lastOn)return;lastOn=on;document.documentElement.dataset.zvGl=on?'on':'off';if(canvas)canvas.style.display=on?'':'none'}
-function teardown(){uniformValueCache=new WeakMap();mo?.disconnect();mo=null;lastOn=null;if(vid&&rvfcId&&vid.cancelVideoFrameCallback)try{vid.cancelVideoFrameCallback(rvfcId)}catch(_){}rvfcId=0;ro?.disconnect();ro=null;probeFbo=null;ana.fence=null;ana.pbo=null;ana.valid=false;ana.illInit=false;lp=null;illTex=null;canvas?.remove();hud?.remove();canvas=hud=gl=null;cpu2d=null;compatGL1=null;rendererMode='gl';progs={};tex={};fbo={};gpuTimerExt=null;gpuTimerActive=null;gpuTimerQueue=[];videoTexW=videoTexH=2;hueLutDirty=true;ready=false;state='idle';setOn(false)}
+function teardown(){cpuFallbackFromGL=false;uniformValueCache=new WeakMap();mo?.disconnect();mo=null;lastOn=null;if(vid&&rvfcId&&vid.cancelVideoFrameCallback)try{vid.cancelVideoFrameCallback(rvfcId)}catch(_){}rvfcId=0;ro?.disconnect();ro=null;probeFbo=null;ana.fence=null;ana.pbo=null;ana.valid=false;ana.illInit=false;lp=null;illTex=null;canvas?.remove();hud?.remove();canvas=hud=gl=null;cpu2d=null;compatGL1=null;rendererMode='gl';progs={};tex={};fbo={};gpuTimerExt=null;gpuTimerActive=null;gpuTimerQueue=[];videoTexW=videoTexH=2;hueLutDirty=true;ready=false;state='idle';setOn(false)}
 function fail(why){try{if(gl&&gpuTimerActive){gl.endQuery(gpuTimerExt?.TIME_ELAPSED_EXT||gl.TIME_ELAPSED_EXT);gpuTimerQueue.push(gpuTimerActive);gpuTimerActive=null}}catch(_){}failWhy=String(why);notice('Video pixel processing is unavailable; native global filters remain active. '+why);failSrc=vid?vid.currentSrc||'':'';console.warn('[ZV TEXTURING] Renderer unavailable, falling back to native CSS filters:',why);teardown();state='failed:'+why}
-function initCPUFallback(v,reason){
+function initCPUFallback(v,reason,fromGL=false){
+  cpuFallbackFromGL=!!fromGL;
   try{gl?.getExtension('WEBGL_lose_context')?.loseContext()}catch(_){}
   try{canvas?.remove()}catch(_){}
   gl=null;progs={};tex={};fbo={};vao=null;hfOK=false;
@@ -449,7 +450,7 @@ function initCPUFallback(v,reason){
 function attach(v,forceCPU=false){vid=v;state='idle';ready=false;level=0;lastDrop=0;benchDone=true;benchIdx=0;bench={video:[],c2d:[],vf:[]};ingestM='video';slowStrikes=0;qualityWarmupAt=performance.now();qualityWarmupDone=false;lastCheck=qualityWarmupAt;gov.bad=0;gov.cleanSince=0;gov.lastStep=0;gpuSamples.length=0;probeList=[];probeDone=false;lastProbe=0;analysisReadbackReady=false;probeTries=0;lastT=-1;histValid=false;layoutDirty=true;lastOn=null;pace.reset();canvas=document.createElement('canvas');canvas.id='zv-gl';canvas.style.display='none';v.after(canvas);
   rendererMode='gl';
   if(forceCPU){try{initCPUFallback(v,'CPU color mode selected; custom WebGL is reserved for Material Depth')}catch(cpuErr){return fail('Canvas 2D color processor unavailable: '+cpuErr.message)}}
-  else try{initGL()}catch(e){try{if(/running on the CPU/.test(e.message))throw new Error('Software GL path refused by performance guard');initGL1Fallback(v,e.message)}catch(gl1Err){try{initCPUFallback(v,e.message+'; WebGL1 unavailable: '+gl1Err.message)}catch(cpuErr){return fail(e.message+'; WebGL1 fallback: '+gl1Err.message+'; Canvas 2D fallback unavailable: '+cpuErr.message)}}}
+  else try{initGL()}catch(e){try{if(/running on the CPU/.test(e.message))throw new Error('Software GL path refused by performance guard');initGL1Fallback(v,e.message)}catch(gl1Err){try{initCPUFallback(v,e.message+'; WebGL1 unavailable: '+gl1Err.message,true)}catch(cpuErr){return fail(e.message+'; WebGL1 fallback: '+gl1Err.message+'; Canvas 2D fallback unavailable: '+cpuErr.message)}}}
   v.addEventListener('emptied',()=>{histValid=false;lastOn=null;globalThis.ZVAnalysis?.reset();ana.valid=false;ana.illInit=false;lp=null;ready=false;if(canvas)canvas.style.display='none'});
   hasRvfc='requestVideoFrameCallback' in v;if(hasRvfc){/* Render INSIDE the frame callback: every presented video frame gets its own render in the same frame cycle (no flag that can coalesce two frames into one). */
     const cb=(now,meta)=>{newFrame=true;pace.note(now,meta);rvfcId=v.requestVideoFrameCallback(cb);if(v===vid&&canvas&&state==='on'&&!document.hidden)frameBody(now)};rvfcId=v.requestVideoFrameCallback(cb)}/* no rVFC (Firefox <132): loop() polls currentTime instead */
@@ -500,7 +501,7 @@ function maintain(){
   const v=document.querySelector(SEL);if(!v){if(canvas)teardown();return null}
   if(state.startsWith('failed')&&v.currentSrc&&v.currentSrc!==failSrc&&v.readyState>=1&&slowFails<2&&!/CPU/.test(failWhy))state='idle';/* new video: retry once */
   const wantGL=!!md.enabled&&!!cfg.gl;
-  const modeMismatch=wantGL?rendererMode==='2d':rendererMode!=='2d';
+  const modeMismatch=wantGL?(rendererMode==='2d'&&!cpuFallbackFromGL):rendererMode!=='2d';
   if(v!==vid||!canvas||modeMismatch){if(canvas)teardown();attach(v,!wantGL)}
   return v}
 /* The per-frame work. Called from the video-frame callback (one call per presented frame) and from the rAF loop (settings changes, resizes, paused video). */
