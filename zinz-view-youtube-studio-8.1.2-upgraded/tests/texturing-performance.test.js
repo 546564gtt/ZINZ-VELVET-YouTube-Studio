@@ -23,7 +23,7 @@ assert.match(source, /const pendingAnalysisBuf=new Uint8Array\(AW\*AH\*4\),pendi
 assert.doesNotMatch(source, /queueUpdate\(ana\.buf\.slice\(\)/);
 
 for (const name of ['u1f', 'u1i', 'u2f', 'u3f', 'u1fv', 'u3fv']) {
-  assert.match(source, new RegExp(`function ${name}\\\\(`), `${name} cache helper exists`);
+  assert.ok(source.includes(`function ${name}(`), `${name} cache helper exists`);
 }
 assert.match(source, /let uniformValueCache=new WeakMap\(\)/);
 assert.match(source, /function u1f\(loc,x\)\{if\(loc===null\|\|loc===undefined\)return;/);
